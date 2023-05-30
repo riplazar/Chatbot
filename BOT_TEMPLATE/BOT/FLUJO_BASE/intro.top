@@ -1,0 +1,11 @@
+﻿topic: ~intro keep repeat ()
+
+u: (%hour>=12) $buendia = una_buena_tarde  $buenosdias = Buenas_Tardes
+
+u: (%hour<12) $buendia = un_buen_día   $buenosdias = Buenos_Dias
+
+t: Intro ()
+   $buenosdias. ^jsonundecodestring(%$)
+
+   $estado = ~ustedEs
+   

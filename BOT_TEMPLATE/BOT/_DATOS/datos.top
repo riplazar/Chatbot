@@ -1,0 +1,15 @@
+﻿outputmacro: ^myfunc1(^resp)
+^resp
+
+
+topic: ~datos keep repeat ()
+
+
+u: (%hour>=12) $buendia = una_buena_tarde  $buenosdias = Buenas_Tardes
+
+u: (%hour<12) $buendia = un_buen_día   $buenosdias = Buenos_Dias
+
+u: ANEXO-TRANSFERENCIA()
+
+  $derivacion = 56988261301
+  $anexo = ^join( "netuno/8812611" $derivacion )

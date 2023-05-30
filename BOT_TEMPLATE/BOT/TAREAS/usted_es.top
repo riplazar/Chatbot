@@ -1,0 +1,133 @@
+﻿topic: ~ustedEs keep repeat ()
+
+t: (!$sp)
+        $sp = 0 
+        $x = ^jsoncreate(TRANSIENT object)
+                $x.intencionContacto =  None
+                $x.intencionBot = CONSULTA_IDENTIDAD
+                $x.comandoAcanal = MAX_3-SILENCE_2
+                $x.comandoReporteria = TIPIFICAR_CONVERSACION
+                $x.argumentoComando.tipificacion = NO_CONTESTAN
+                $x.argumentoComando.codigo = NC
+        [^jsonwrite($x)] 
+        ^jsonundecodestring(%$)  Hola bien venido a nuestra área de atención al cliente 
+por favor le ruego seleccionar la opción que desea utilizar
+1-	Confirmación de citas
+2-	Confirmación de citas Múltiples
+3-	Cancelación Cita
+4-	Reagendamiento Automático
+5-	Bloquear Agenda 
+6-	Lista De espera
+
+u: () 	
+	$x = ^jsoncreate(TRANSIENT object)
+                $x.intencionContacto =  None
+                $x.intencionBot = CONSULTA_TRANSFERENCIA
+                $x.comandoAcanal = None
+        [^jsonwrite($x)]       
+
+a: BUZON ( ~buzonc )
+        $x = ^jsoncreate(TRANSIENT object)
+                $x.intencionContacto =  BUZON
+                $x.intencionBot = FINALIZAR_CONVERSACION
+                $x.comandoAcanal = FINALIZAR_COVERSACION
+                $x.comandoReporteria = TIPIFICAR_CONVERSACION
+                $x.argumentoComando.tipificacion = BUZON
+                $x.argumentoComando.codigo = BZ
+        [^jsonwrite($x)]
+        # Disculpe la molestia. ^jsonundecodestring(%$) ^respond(~adios)
+        $estado = null
+
+a: CONFIRMACION-TRANFERENCIA ( *~2 ~sic [~afirmativo ~soy_yo ~operadora ~digame 1 ] ok ) 
+	$x = ^jsoncreate(TRANSIENT object)
+                $x.intencionContacto =  ACEPTA_TRANSFERENCIA
+                $x.intencionBot = DERIVA_EJECUTIVO
+                $x.comandoAcanal = TRANSFERIR_CONVERSACION
+                $x.destinoTransferencia = $anexo
+                $x.comandoReporteria = TIPIFICAR_CONVERSACION
+                $x.argumentoComando.tipificacion = EJECUTIVO
+                $x.argumentoComando.codigo = EJ
+        [^jsonwrite($x)]
+        ^jsonundecodestring(%$) Por favor espere en línea mientras lo transferimos con uno de nuestros ejecutivos aaaa.
+	$estado = null
+	$sp = null
+	
+a: CONFIRMACION-TRANFERENCIA ( *~2 [~afirmativo ~soy_yo ~operadora ~digame 1 ok ]  ~sic ) 
+	$x = ^jsoncreate(TRANSIENT object)
+                $x.intencionContacto =  ACEPTA_TRANSFERENCIA
+                $x.intencionBot = DERIVA_EJECUTIVO
+                $x.comandoAcanal = TRANSFERIR_CONVERSACION
+                $x.destinoTransferencia = $anexo
+                $x.comandoReporteria = TIPIFICAR_CONVERSACION
+                $x.argumentoComando.tipificacion = EJECUTIVO
+                $x.argumentoComando.codigo = EJ
+        [^jsonwrite($x)]
+        ^jsonundecodestring(%$) Por favor espere en línea mientras lo transferimos con uno de nuestros ejecutivos bbbbb.
+        $estado = null
+        $sp = null
+	
+a: CONFIRMACION-TRANFERENCIA ( < [~sic ~afirmativo ~soy_yo ya ~digame 1 ] > ) 
+	$x = ^jsoncreate(TRANSIENT object)
+                $x.intencionContacto =  ACEPTA_TRANSFERENCIA
+                $x.intencionBot = DERIVA_EJECUTIVO
+                $x.comandoAcanal = TRANSFERIR_CONVERSACION
+                $x.destinoTransferencia = $anexo
+                $x.comandoReporteria = TIPIFICAR_CONVERSACION
+                $x.argumentoComando.tipificacion = EJECUTIVO
+                $x.argumentoComando.codigo = EJ         
+        [^jsonwrite($x)]
+        ^jsonundecodestring(%$) Hola Paulo, soy Gaby del Área Médica de la clínica. Le escribo para confirmar su cita para mañana jueves 13 de enero a las 13:45 que tiene con la Dra. Fabiola Lavanderos de Otorrinolaringología en  nuestra sucursal de Providencia. ¿Confirma su cita?.
+        $estado = null
+	$sp = null
+
+a: CONFIRMACION-TRANFERENCIA ( *~2 [~sic ~afirmativo ~soy_yo 1 ] ) 
+	$x = ^jsoncreate(TRANSIENT object)
+                $x.intencionContacto =  ACEPTA_TRANSFERENCIA
+                $x.intencionBot = DERIVA_EJECUTIVO
+                $x.comandoAcanal = TRANSFERIR_CONVERSACION
+                $x.destinoTransferencia = $anexo
+                $x.comandoReporteria = TIPIFICAR_CONVERSACION
+                $x.argumentoComando.tipificacion = EJECUTIVO
+                $x.argumentoComando.codigo = EJ
+        [^jsonwrite($x)]
+        ^jsonundecodestring(%$) Por favor espere en línea mientras lo transferimos con uno de nuestros ejecutivos.
+        $estado = null
+	$sp = null
+
+a: RECHAZA-TRANSFERENCIA ( *~2 [ ~noc ~equivocadoc 0 ]) 
+        $x = ^jsoncreate(TRANSIENT object)
+                $x.intencionContacto =  DECLINA_TRANSFERENCIA
+                $x.intencionBot = FINALIZAR_CONVERSACION
+                $x.comandoAcanal = FINALIZAR_CONVERSACION
+                $x.comandoReporteria = TIPIFICAR_CONVERSACION
+                $x.argumentoComando.tipificacion = DECLINA_TRANSFERENCIA
+                $x.argumentoComando.codigo = DT
+        [^jsonwrite($x)]
+        ^jsonundecodestring(%$) Entiendo, muchas gracias. Que tenga un buen día.
+        $estado = null
+        $sp = null
+		
+
+a: MENSAJE-VACIO     (%length==0)   $sp += 1	
+	$x = ^jsoncreate(TRANSIENT object)
+                $x.intencionContacto =  MENSAJE_VACIO
+                $x.intencionBot = CONSULTA_TRANSFERENCIA
+                $x.comandoAcanal = None
+                $x.comandoReporteria = TIPIFICAR_CONVERSACION
+                $x.argumentoComando.tipificacion = NO_RESPONDE
+                $x.argumentoComando.codigo = NR
+        [^jsonwrite($x)]	
+	^jsonundecodestring(%$) Por favor diga sí o no.
+	$estado = ~ustedEs
+
+a: MENSAJE-DESCONOCIDO ( )  $sp += 1	
+	$x = ^jsoncreate(TRANSIENT object)
+                $x.intencionContacto =  MENSAJE_DESCONOCIDO
+                $x.intencionBot = CONSULTA_TRANSFERENCIA
+                $x.comandoAcanal = None
+                $x.comandoReporteria = TIPIFICAR_CONVERSACION
+                $x.argumentoComando.tipificacion = NO_ENTIENDE
+                $x.argumentoComando.codigo = NE
+	[^jsonwrite($x)]	
+	^jsonundecodestring(%$) Por favor diga sí o no.
+	$estado = ~ustedEs
